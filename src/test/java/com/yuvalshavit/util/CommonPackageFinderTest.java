@@ -4,10 +4,10 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
 
-public class SubstringFinderTest {
+public class CommonPackageFinderTest {
   @Test
   public void basic() {
-    SubstringFinder finder = new SubstringFinder();
+    CommonPackageFinder finder = new CommonPackageFinder();
     assertEquals(finder.get(), null);
 
     finder.accept("one.two.three.four");

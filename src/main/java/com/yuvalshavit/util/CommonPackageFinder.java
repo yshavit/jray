@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class SubstringFinder implements Consumer<String> {
+public class CommonPackageFinder implements Consumer<String> {
 
   public static <T> String get(Collection<? extends T> strings, Function<? super T, String> toString) {
-    SubstringFinder finder = new SubstringFinder();
+    CommonPackageFinder finder = new CommonPackageFinder();
     strings.stream().map(toString).forEach(finder);
     return finder.get();
 
