@@ -30,7 +30,7 @@ public class Edge implements Comparable<Edge> {
 
   @Override
   public String toString() {
-    return String.format("%s %s %s", from, relationship, to);
+    return String.format("%s %s %s", from.getClassName(), relationship, to.getClassName());
   }
 
   @Override
