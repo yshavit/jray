@@ -52,7 +52,7 @@ public class JarReader {
           for (Consumer<Graph> modifier : graphModifiers) {
             modifier.accept(graph);
           }
-          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
+          graph.getEdges().forEach(System.out::println);
         } catch (IOException e) {
           e.printStackTrace();
         }

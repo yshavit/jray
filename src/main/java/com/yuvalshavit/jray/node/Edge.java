@@ -53,4 +53,8 @@ public class Edge implements Comparable<Edge> {
   public Node to() {
     return to;
   }
+
+  public Relationship relationship() {
+    return relationship;
+  }
 }
