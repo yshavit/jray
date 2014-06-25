@@ -1,0 +1,5 @@
+- "collapse" anonymous classes; that is, their relationship is actually of their enclosing class
+- collapse private inner/nested classes, or package-private inner/nested classes with some annotation.
+  (Note: can't use guava's @VisibleForTesting, because it's not retained)
+- for both of the above, make sure it collapses all the way up. E.g. an anonymous class within a private class
+- enums right now have a self-cycle via builds
