@@ -10,20 +10,23 @@ public class CommonPackageFinderTest {
     CommonPackageFinder finder = new CommonPackageFinder();
     assertEquals(finder.get(), null);
 
-    finder.accept("one.two.three.four");
-    assertEquals(finder.get(), "one.two.three.four");
+    finder.accept("one.two.three.four.ClassA");
+    assertEquals(finder.get(), "one.two.three.four.");
 
-    finder.accept("one.two.three.four");
-    assertEquals(finder.get(), "one.two.three.four");
+    finder.accept("one.two.three.four.ClassB");
+    assertEquals(finder.get(), "one.two.three.four.");
 
     finder.accept(null);
-    assertEquals(finder.get(), "one.two.three.four");
+    assertEquals(finder.get(), "one.two.three.four.");
 
-    finder.accept("one.two.three.four.five");
-    assertEquals(finder.get(), "one.two.three.four");
+    finder.accept("one.two.three.four.five.ClassC");
+    assertEquals(finder.get(), "one.two.three.four.");
 
-    finder.accept("one.two.three");
-    assertEquals(finder.get(), "one.two.three");
+    finder.accept("one.two.three.ClassD");
+    assertEquals(finder.get(), "one.two.three.");
+
+    finder.accept("one.two.trice.ClassE");
+    assertEquals(finder.get(), "one.two.");
 
     finder.accept("six");
     assertEquals(finder.get(), "");

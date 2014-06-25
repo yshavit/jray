@@ -20,22 +20,33 @@ public class CommonPackageFinder implements Consumer<String> {
     if (string == null) {
       return;
     }
+    int lastDotIncoming = string.lastIndexOf('.');
+    if (lastDotIncoming < 0) {
+      s = "";
+      return;
+    }
+    string = string.substring(0, lastDotIncoming + 1);
     if (s == null) {
       s = string;
     } else {
       int oldStrLen = s.length();
       int incomingStringLen = string.length();
-      int end = 0;
-      for (int max = Math.min(incomingStringLen, oldStrLen); end < max; ++end) {
-        if (string.charAt(end) != s.charAt(end)) {
+      int lastDot = 0;
+      for (int i = 0, max = Math.min(incomingStringLen, oldStrLen); i < max; ++i) {
+        if (string.charAt(i) != s.charAt(i)) {
           break;
         }
+        if (string.charAt(i) == '.') {
+          lastDot = i;
+        }
       }
-      if (oldStrLen != end) {
-        if (incomingStringLen == end) {
+      int lastDotIdx = lastDot + 1;
+      if (oldStrLen != lastDotIdx) {
+
+        if (incomingStringLen == lastDotIdx) {
           s = string;
         } else {
-          s = string.substring(0, end);
+          s = string.substring(0, lastDotIdx);
         }
       }
     }
