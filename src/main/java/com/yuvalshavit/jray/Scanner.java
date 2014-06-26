@@ -34,6 +34,9 @@ public class Scanner extends ClassVisitor {
     if ("java.lang.Enum".equals(superName)) {
       graph.addNodeAttribute(visiting, NodeAttribute.ENUM);
     }
+    if ((access & Opcodes.ACC_PRIVATE) != 0) {
+      graph.addNodeAttribute(visiting, NodeAttribute.PRIVATE);
+    }
     for (String interfaceName : interfaces) {
       link(visiting, Relationship.IMPLEMENTS, node(interfaceName));
     }
