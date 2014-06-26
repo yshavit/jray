@@ -84,6 +84,6 @@ public class Scanner extends ClassVisitor {
   }
 
   private void link(Node from, Relationship relationship, Node to) {
-    graph.add(new Edge(from, relationship, to));
+    graph.add(from, relationship, to);
   }
 }

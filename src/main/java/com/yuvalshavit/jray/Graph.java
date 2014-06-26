@@ -28,7 +28,8 @@ public class Graph {
     return anonymousClasses;
   }
 
-  public void add(Edge edge) {
+  public void add(Node from, Relationship relationship, Node to) {
+    Edge edge = new Edge(from, relationship, to);
     Set<Edge> edgeSet = edges.get(edge.relationship());
     if (edgeSet == null) {
       edgeSet = new HashSet<>();
