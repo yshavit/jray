@@ -12,15 +12,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Graph {
   private final Set<Node> nodes = new HashSet<>();
-  private final Map<Relationship, Set<Edge>> edges = new EnumMap<>(Relationship.class);
+  private final Map<Relationship, Map<Node, Collection<Node>>> edges = new EnumMap<>(Relationship.class);
   private final Map<Node, EnumSet<NodeAttribute>> nodeAttributes = new HashMap<>();
 
   public Set<Edge> getEdges() {
-    return edges.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+    Set<Edge> allEdges = new HashSet<>();
+    for (Map.Entry<Relationship, Map<Node, Collection<Node>>> edgesForRelationship : edges.entrySet()) {
+      Relationship relationship = edgesForRelationship.getKey();
+      for (Map.Entry<Node, Collection<Node>> edgeEntry : edgesForRelationship.getValue().entrySet()) {
+        Node from = edgeEntry.getKey();
+        edgeEntry.getValue().stream().map(to -> new Edge(from, relationship, to)).forEach(allEdges::add);
+      }
+    }
+    return allEdges;
   }
 
   public Set<Node> getNodes() {
@@ -28,13 +35,17 @@ public class Graph {
   }
 
   public void add(Node from, Relationship relationship, Node to) {
-    Edge edge = new Edge(from, relationship, to);
-    Set<Edge> edgeSet = edges.get(edge.relationship());
-    if (edgeSet == null) {
-      edgeSet = new HashSet<>();
-      edges.put(edge.relationship(), edgeSet);
+    Map<Node, Collection<Node>> edgesForRelationship = edges.get(relationship);
+    if (edgesForRelationship == null) {
+      edgesForRelationship = new HashMap<>();
+      edges.put(relationship, edgesForRelationship);
     }
-    edgeSet.add(edge);
+    Collection<Node> edgesForFromNode = edgesForRelationship.get(from);
+    if (edgesForFromNode == null) {
+      edgesForFromNode = new HashSet<>();
+      edgesForRelationship.put(from, edgesForFromNode);
+    }
+    edgesForFromNode.add(to);
   }
 
   public void add(Node node) {
