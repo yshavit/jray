@@ -1,6 +1,7 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Node;
+import com.yuvalshavit.jray.node.NodeAttribute;
 import com.yuvalshavit.jray.node.Relationship;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -30,6 +31,9 @@ public class Scanner extends ClassVisitor {
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     visiting = node(name);
     link(visiting, Relationship.IS_A, node(superName));
+    if ("java.lang.Enum".equals(superName)) {
+      graph.addNodeAttribute(visiting, NodeAttribute.ENUM);
+    }
     for (String interfaceName : interfaces) {
       link(visiting, Relationship.IMPLEMENTS, node(interfaceName));
     }
@@ -60,7 +64,7 @@ public class Scanner extends ClassVisitor {
       if (inner == null) {
         inner = node(name);
       }
-      graph.addAnonymousClass(inner);
+      graph.addNodeAttribute(inner, NodeAttribute.ANONYMOUS);
     }
   }
 
