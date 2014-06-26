@@ -22,10 +22,9 @@ public class FilterEdgesToKnownNodes implements Consumer<Graph> {
     }
 
     if (!commonPackage.isEmpty()) {
-      for (Iterator<Edge> iterator = graph.getEdges().iterator(); iterator.hasNext(); ) {
-        Edge edge = iterator.next();
+      for (Edge edge : graph.getEdges()) {
         if (!(nodeIsInPackage(edge.from(), commonPackage) && nodeIsInPackage(edge.to(), commonPackage))) {
-          iterator.remove();
+          graph.remove(edge);
         }
       }
     }

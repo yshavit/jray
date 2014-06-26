@@ -72,4 +72,14 @@ public class Graph {
       attributes.add(attribute);
     }
   }
+
+  public void remove(Edge edge) {
+    Map<Relationship, Set<Node>> outgoing = edges.get(edge.from());
+    if (outgoing != null) {
+      Set<Node> successors = outgoing.get(edge.relationship());
+      if (successors != null) {
+        successors.remove(edge.to());
+      }
+    }
+  }
 }

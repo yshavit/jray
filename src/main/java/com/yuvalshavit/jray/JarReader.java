@@ -1,6 +1,8 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
+import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
+import com.yuvalshavit.jray.plugin.RemoveSelfLinks;
 import org.objectweb.asm.ClassReader;
 
 import java.io.BufferedInputStream;
@@ -39,8 +41,10 @@ public class JarReader {
   }
 
   public static void main(String[] filePaths) {
-    List<Consumer<Graph>> graphModifiers = Arrays.asList(new FilterEdgesToKnownNodes());
-
+    List<Consumer<Graph>> graphModifiers = Arrays.asList(
+      new FilterEdgesToKnownNodes(),
+      new RemoveSelfLinks(),
+      new FoldInnerClassesIntoEnclosing());
 
     for (String filePath : filePaths) {
       File file = new File(filePath);
@@ -52,8 +56,8 @@ public class JarReader {
           for (Consumer<Graph> modifier : graphModifiers) {
             modifier.accept(graph);
           }
-          graph.getEdges().forEach(System.out::println);
-          graph.getNodes().forEach(System.out::println);
+          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
+          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
           System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
         } catch (IOException e) {
           e.printStackTrace();
