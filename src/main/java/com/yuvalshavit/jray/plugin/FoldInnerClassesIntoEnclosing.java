@@ -22,7 +22,7 @@ public final class FoldInnerClassesIntoEnclosing implements Consumer<Graph> {
     });
   }
 
-  private Node getEnclosingClass(Node from, Graph graph) {
+  private static Node getEnclosingClass(Node from, Graph graph) {
     // TODO memoize
     Set<Node> tos = graph.getSuccessors(from, Relationship.ENCLOSED_BY);
     if (tos.isEmpty()) {

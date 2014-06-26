@@ -1,7 +1,6 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Edge;
-import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Relationship;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
@@ -14,13 +13,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
