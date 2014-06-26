@@ -1,5 +1,8 @@
 package com.yuvalshavit.jray;
 
+import com.yuvalshavit.jray.node.Edge;
+import com.yuvalshavit.jray.node.Node;
+import com.yuvalshavit.jray.node.Relationship;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
 import com.yuvalshavit.jray.plugin.RemoveSelfLinks;
@@ -9,10 +12,15 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -56,13 +64,26 @@ public class JarReader {
           for (Consumer<Graph> modifier : graphModifiers) {
             modifier.accept(graph);
           }
-          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
-          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
-          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
+//          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
+//          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
+//          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
+          printDotFile(file.getName(), graph.getEdges(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }
       }
     }
+  }
+
+  private static void printDotFile(String name, Set<Edge> edges, PrintStream out) throws IOException {
+    out.printf("digraph \"%s\" {%n", name);
+    edges.stream()
+      .filter(e -> e.relationship() == Relationship.CONSUMES || e.relationship() == Relationship.PRODUCES)
+      .sorted()
+      .forEach(e -> out.printf("  \"%s\" -> \"%s\" [label=\"%s\"];%n",
+                               e.from().getSimpleClasssName(),
+                               e.to().getSimpleClasssName(),
+                               e.relationship().name().toLowerCase()));
+    out.println("}");
   }
 }
