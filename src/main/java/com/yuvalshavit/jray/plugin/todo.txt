@@ -1,6 +1,1 @@
-- for folding associations, make sure it folds all the way up. E.g. an anonymous class within a private class
 - how are generics handled?
-
-Validation:
-
-Graph should take Node and produce Edge; Edge should produce Node and relationship

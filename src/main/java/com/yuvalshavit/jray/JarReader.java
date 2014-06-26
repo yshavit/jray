@@ -1,6 +1,7 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Edge;
+import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Relationship;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
@@ -75,10 +76,33 @@ public class JarReader {
     edges.stream()
       .filter(e -> e.relationship() == Relationship.CONSUMES || e.relationship() == Relationship.PRODUCES)
       .sorted()
-      .forEach(e -> out.printf("  \"%s\" -> \"%s\" [label=\"%s\"];%n",
-                               e.from().getSimpleClasssName(),
-                               e.to().getSimpleClasssName(),
-                               e.relationship().name().toLowerCase()));
+      .forEach(e -> {
+        Node from;
+        Node to;
+        String color;
+        switch (e.relationship()) {
+        case PRODUCES:
+          color = "green";
+          from = e.from();
+          to = e.to();
+          break;
+        case CONSUMES:
+          color = "blue";
+          // reverse the arrows
+          from = e.to();
+          to = e.from();
+          break;
+        default:
+          from = e.from();
+          to = e.to();
+          color = "black";
+          break;
+        }
+        out.printf("  \"%s\" -> \"%s\" [color=%s];%n",
+                               from.getSimpleClasssName(),
+                               to.getSimpleClasssName(),
+                               color);
+      });
     out.println("}");
   }
 }
