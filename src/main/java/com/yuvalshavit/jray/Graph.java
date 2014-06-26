@@ -2,12 +2,10 @@ package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Edge;
-import com.yuvalshavit.jray.node.NodeAttribute;
 import com.yuvalshavit.jray.node.Relationship;
 
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,7 +16,6 @@ import java.util.stream.Stream;
 public class Graph {
   private final Set<Node> nodes = new HashSet<>();
   private final Map<Node, Map<Relationship, Set<Node>>> edges = new HashMap<>();
-  private final Map<Node, EnumSet<NodeAttribute>> nodeAttributes = new HashMap<>();
 
   public Set<Edge> getEdges() {
     Stream<Edge> edgesStreams = edges.entrySet().stream().flatMap(entry -> {
@@ -62,15 +59,6 @@ public class Graph {
 
   public void add(Node node) {
     nodes.add(node);
-  }
-
-  public void addNodeAttribute(Node node, NodeAttribute attribute) {
-    EnumSet<NodeAttribute> attributes = nodeAttributes.get(node);
-    if (attributes == null) {
-      nodeAttributes.put(node, EnumSet.of(attribute));
-    } else {
-      attributes.add(attribute);
-    }
   }
 
   public void remove(Edge edge) {
