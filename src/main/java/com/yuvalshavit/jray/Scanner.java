@@ -1,7 +1,6 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Node;
-import com.yuvalshavit.jray.node.Edge;
 import com.yuvalshavit.jray.node.Relationship;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -41,9 +40,9 @@ public class Scanner extends ClassVisitor {
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     if ((Opcodes.ACC_PUBLIC & access) != 0) {
       Type t = Type.getMethodType(desc);
-      handleIfRef(t.getReturnType(), to -> link(visiting, Relationship.BUILDS, to));
+      handleIfRef(t.getReturnType(), to -> link(visiting, Relationship.PRODUCES, to));
       for (Type argType : t.getArgumentTypes()) {
-        handleIfRef(argType, argNode -> link(visiting, Relationship.USES, argNode));
+        handleIfRef(argType, argNode -> link(visiting, Relationship.CONSUMES, argNode));
       }
     }
     return null;
