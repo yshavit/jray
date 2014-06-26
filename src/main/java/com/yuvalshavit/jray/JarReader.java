@@ -53,6 +53,8 @@ public class JarReader {
             modifier.accept(graph);
           }
           graph.getEdges().forEach(System.out::println);
+          graph.getNodes().forEach(System.out::println);
+          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
         } catch (IOException e) {
           e.printStackTrace();
         }

@@ -49,6 +49,27 @@ public class Scanner extends ClassVisitor {
     return null;
   }
 
+  @Override
+  public void visitInnerClass(String name, String outerName, String innerName, int access) {
+    Node inner = null;
+    if (outerName != null) {
+      Node outer = node(outerName);
+      inner = node(name);
+      link(inner, Relationship.ENCLOSED_BY, outer);
+    }
+    if (innerName == null) {
+      if (inner == null) {
+        inner = node(name);
+      }
+      graph.addAnonymousClass(inner);
+    }
+  }
+
+  @Override
+  public void visitOuterClass(String owner, String name, String desc) {
+    link(visiting, Relationship.ENCLOSED_BY, node(owner));
+  }
+
   private void handleIfRef(Type type, Consumer<? super Node> action) {
     String className = type.getClassName();
     if (className != null) {

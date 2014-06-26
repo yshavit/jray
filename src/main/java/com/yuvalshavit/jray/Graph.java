@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class Graph {
   private final Set<Node> nodes = new HashSet<>();
   private final Map<Relationship, Set<Edge>> edges = new EnumMap<>(Relationship.class);
+  private final Set<Node> anonymousClasses = new HashSet<>();
 
   public Set<Edge> getEdges() {
     return edges.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
@@ -21,6 +22,10 @@ public class Graph {
 
   public Set<Node> getNodes() {
     return nodes;
+  }
+
+  public Set<Node> getAnonymousClasses() {
+    return anonymousClasses;
   }
 
   public void add(Edge edge) {
@@ -34,5 +39,9 @@ public class Graph {
 
   public void add(Node node) {
     nodes.add(node);
+  }
+
+  public void addAnonymousClass(Node node) {
+    anonymousClasses.add(node);
   }
 }
