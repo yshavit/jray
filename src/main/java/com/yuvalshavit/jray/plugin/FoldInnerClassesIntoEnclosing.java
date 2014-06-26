@@ -12,7 +12,7 @@ public final class FoldInnerClassesIntoEnclosing implements Consumer<Graph> {
 
   @Override
   public void accept(Graph graph) {
-    graph.getEdges().stream().filter(e -> e.relationship() == Relationship.ENCLOSED_BY).forEach(edge -> {
+    graph.getEdges().stream().filter(e -> e.relationship() != Relationship.ENCLOSED_BY).forEach(edge -> {
       Node fromEnclosing = getEnclosingClass(edge.from(), graph);
       if (!edge.from().equals(fromEnclosing)) {
         graph.remove(edge);
