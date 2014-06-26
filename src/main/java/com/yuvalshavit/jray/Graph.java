@@ -12,32 +12,33 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Graph {
   private final Set<Node> nodes = new HashSet<>();
-  private final Map<Relationship, Map<Node, Set<Node>>> edges = new EnumMap<>(Relationship.class);
+  private final Map<Node, Map<Relationship, Set<Node>>> edges = new HashMap<>();
   private final Map<Node, EnumSet<NodeAttribute>> nodeAttributes = new HashMap<>();
 
   public Set<Edge> getEdges() {
-    Set<Edge> allEdges = new HashSet<>();
-    for (Map.Entry<Relationship, Map<Node, Set<Node>>> edgesForRelationship : edges.entrySet()) {
-      Relationship relationship = edgesForRelationship.getKey();
-      for (Map.Entry<Node, Set<Node>> edgeEntry : edgesForRelationship.getValue().entrySet()) {
-        Node from = edgeEntry.getKey();
-        edgeEntry.getValue().stream().map(to -> new Edge(from, relationship, to)).forEach(allEdges::add);
-      }
-    }
-    return Collections.unmodifiableSet(allEdges);
+    Stream<Edge> edgesStreams = edges.entrySet().stream().flatMap(entry -> {
+      Node from = entry.getKey();
+      return entry.getValue().entrySet().stream().flatMap(halfEdge -> {
+        Relationship relationship = halfEdge.getKey();
+        return halfEdge.getValue().stream().map(to -> new Edge(from, relationship, to));
+      });
+    });
+    return edgesStreams.collect(Collectors.toSet());
   }
 
   public Set<Node> getSuccessors(Node from, Relationship relationship) {
-    Map<Node, Set<Node>> edgesForRelationship = edges.get(relationship);
-    if (edgesForRelationship == null) {
+    Map<Relationship, Set<Node>> outgoing = edges.get(from);
+    if (outgoing == null) {
       return Collections.emptySet();
     }
-    Set<Node> successors = edgesForRelationship.get(from);
+    Set<Node> successors = outgoing.get(relationship);
     return successors != null
-      ? successors
+      ? Collections.unmodifiableSet(successors)
       : Collections.emptySet();
   }
 
@@ -46,17 +47,17 @@ public class Graph {
   }
 
   public void add(Node from, Relationship relationship, Node to) {
-    Map<Node, Set<Node>> edgesForRelationship = edges.get(relationship);
-    if (edgesForRelationship == null) {
-      edgesForRelationship = new HashMap<>();
-      edges.put(relationship, edgesForRelationship);
+    Map<Relationship, Set<Node>> outgoing = edges.get(from);
+    if (outgoing == null) {
+      outgoing = new EnumMap<>(Relationship.class);
+      edges.put(from, outgoing);
     }
-    Set<Node> edgesForFromNode = edgesForRelationship.get(from);
-    if (edgesForFromNode == null) {
-      edgesForFromNode = new HashSet<>();
-      edgesForRelationship.put(from, edgesForFromNode);
+    Set<Node> toCollection = outgoing.get(relationship);
+    if (toCollection == null) {
+      toCollection = new HashSet<>();
+      outgoing.put(relationship, toCollection);
     }
-    edgesForFromNode.add(to);
+    toCollection.add(to);
   }
 
   public void add(Node node) {
