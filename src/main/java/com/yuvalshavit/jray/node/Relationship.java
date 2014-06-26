@@ -8,4 +8,7 @@ public enum Relationship {
     return name().replace('_', ' ').toLowerCase();
   }
 
+  public boolean isUsageFlow() {
+    return this == CONSUMES || this == PRODUCES;
+  }
 }
