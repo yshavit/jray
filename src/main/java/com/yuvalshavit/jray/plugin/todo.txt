@@ -3,6 +3,7 @@
   (Note: can't use guava's @VisibleForTesting, because it's not retained)
 - for both of the above, make sure it collapses all the way up. E.g. an anonymous class within a private class
 - enums right now have a self-cycle via builds
+- how are generics handled?
 
 Validation:
 
