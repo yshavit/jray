@@ -99,8 +99,8 @@ public class JarReader {
           break;
         }
         out.printf("  \"%s\" -> \"%s\" [color=%s];%n",
-                               from.getSimpleClasssName(),
-                               to.getSimpleClasssName(),
+                               from.getSimpleClassName(),
+                               to.getSimpleClassName(),
                                color);
       });
     out.println("}");

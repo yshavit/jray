@@ -42,7 +42,7 @@ public class Node implements Comparable<Node> {
     return className;
   }
 
-  public String getSimpleClasssName() {
+  public String getSimpleClassName() {
     int lastDot = className.lastIndexOf('.');
     return lastDot >= 0 && lastDot < className.length() - 1 // the dot can't be the last char
       ? className.substring(lastDot + 1)
