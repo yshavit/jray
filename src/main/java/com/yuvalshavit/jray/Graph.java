@@ -2,10 +2,8 @@ package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Edge;
-import com.yuvalshavit.jray.node.Relationship;
 
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,46 +13,35 @@ import java.util.stream.Stream;
 
 public class Graph {
   private final Set<Node> nodes = new HashSet<>();
-  private final Map<Node, Map<Relationship, Set<Node>>> edges = new HashMap<>();
+  private final Map<Node, Set<Node>> edges = new HashMap<>();
 
   public Set<Edge> getEdges() {
     Stream<Edge> edgesStreams = edges.entrySet().stream().flatMap(entry -> {
       Node from = entry.getKey();
-      return entry.getValue().entrySet().stream().flatMap(halfEdge -> {
-        Relationship relationship = halfEdge.getKey();
-        return halfEdge.getValue().stream().map(to -> new Edge(from, relationship, to));
-      });
+      return entry.getValue().stream().flatMap(to -> Stream.of(new Edge(from, to)));
     });
     return edgesStreams.collect(Collectors.toSet());
   }
 
-  public Set<Node> getSuccessors(Node from, Relationship relationship) {
-    Map<Relationship, Set<Node>> outgoing = edges.get(from);
+  public Set<Node> getSuccessors(Node from) {
+    Set<Node> outgoing = edges.get(from);
     if (outgoing == null) {
       return Collections.emptySet();
     }
-    Set<Node> successors = outgoing.get(relationship);
-    return successors != null
-      ? Collections.unmodifiableSet(successors)
-      : Collections.emptySet();
+    return Collections.unmodifiableSet(outgoing);
   }
 
   public Set<Node> getNodes() {
     return nodes;
   }
 
-  public void add(Node from, Relationship relationship, Node to) {
-    Map<Relationship, Set<Node>> outgoing = edges.get(from);
+  public void add(Node from, Node to) {
+    Set<Node> outgoing = edges.get(from);
     if (outgoing == null) {
-      outgoing = new EnumMap<>(Relationship.class);
+      outgoing = new HashSet<>();
       edges.put(from, outgoing);
     }
-    Set<Node> toCollection = outgoing.get(relationship);
-    if (toCollection == null) {
-      toCollection = new HashSet<>();
-      outgoing.put(relationship, toCollection);
-    }
-    toCollection.add(to);
+    outgoing.add(to);
   }
 
   public void add(Node node) {
@@ -62,12 +49,9 @@ public class Graph {
   }
 
   public void remove(Edge edge) {
-    Map<Relationship, Set<Node>> outgoing = edges.get(edge.from());
+    Set<Node> outgoing = edges.get(edge.from());
     if (outgoing != null) {
-      Set<Node> successors = outgoing.get(edge.relationship());
-      if (successors != null) {
-        successors.remove(edge.to());
-      }
+      outgoing.remove(edge.to());
     }
   }
 }

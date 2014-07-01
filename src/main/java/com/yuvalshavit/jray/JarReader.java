@@ -2,7 +2,6 @@ package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Edge;
 import com.yuvalshavit.jray.node.Node;
-import com.yuvalshavit.jray.node.Relationship;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
 import com.yuvalshavit.jray.plugin.RemoveSelfLinks;
@@ -27,9 +26,8 @@ public class JarReader {
     this.zipFile = zipFile;
   }
 
-  public Graph read() throws IOException {
-    Graph graph = new Graph();
-    Scanner scanner = new Scanner(graph);
+  public Scanner read() throws IOException {
+    Scanner scanner = new Scanner();
     try (FileInputStream fileStreamRaw = new FileInputStream(zipFile);
          BufferedInputStream fileStream = new BufferedInputStream(fileStreamRaw);
          ZipInputStream zipStream = new ZipInputStream(fileStream))
@@ -41,11 +39,11 @@ public class JarReader {
         }
       }
     }
-    return graph;
+    return scanner;
   }
 
   public static void main(String[] filePaths) {
-    List<Consumer<Graph>> graphModifiers = Arrays.asList(
+    List<Consumer<Scanner>> graphModifiers = Arrays.asList(
       new FilterEdgesToKnownNodes(),
       new RemoveSelfLinks(),
       new FoldInnerClassesIntoEnclosing());
@@ -56,14 +54,14 @@ public class JarReader {
         System.err.println("No such file: " + filePath);
       } else {
         try {
-          Graph graph = new JarReader(file).read();
-          for (Consumer<Graph> modifier : graphModifiers) {
-            modifier.accept(graph);
+          Scanner scanner = new JarReader(file).read();
+          for (Consumer<Scanner> modifier : graphModifiers) {
+            modifier.accept(scanner);
           }
 //          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
 //          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
 //          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
-          printDotFile(file.getName(), graph.getEdges(), System.out);
+          printDotFile(file.getName(), scanner.getFlow().getEdges(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -74,21 +72,10 @@ public class JarReader {
   private static void printDotFile(String name, Set<Edge> edges, PrintStream out) throws IOException {
     out.printf("digraph \"%s\" {%n", name);
     edges.stream()
-      .filter(e -> e.relationship() == Relationship.FLOW)
       .sorted()
       .forEach(e -> {
-        Node from;
-        Node to;
-        switch (e.relationship()) {
-        case FLOW:
-          from = e.from();
-          to = e.to();
-          break;
-        default:
-          from = e.from();
-          to = e.to();
-          break;
-        }
+        Node from = e.from();
+        Node to = e.to();
         out.printf("  \"%s\" -> \"%s\";%n",
                                from.getSimpleClassName(),
                                to.getSimpleClassName());

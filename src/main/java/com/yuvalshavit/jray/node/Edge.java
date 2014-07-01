@@ -2,12 +2,10 @@ package com.yuvalshavit.jray.node;
 
 public class Edge implements Comparable<Edge> {
   private final Node from;
-  private final Relationship relationship;
   private final Node to;
 
-  public Edge(Node from, Relationship relationship, Node to) {
+  public Edge(Node from, Node to) {
     this.from = from;
-    this.relationship = relationship;
     this.to = to;
   }
 
@@ -16,30 +14,25 @@ public class Edge implements Comparable<Edge> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Edge edge = (Edge) o;
-    return from.equals(edge.from) && relationship == edge.relationship && to.equals(edge.to);
+    return from.equals(edge.from) && to.equals(edge.to);
 
   }
 
   @Override
   public int hashCode() {
     int result = from.hashCode();
-    result = 31 * result + relationship.hashCode();
     result = 31 * result + to.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
-    return String.format("%s %s %s", from.getClassName(), relationship, to.getClassName());
+    return String.format("%s -> %s", from.getClassName(), to.getClassName());
   }
 
   @Override
   public int compareTo(Edge o) {
     int cmp = from.compareTo(o.from);
-    if (cmp != 0) {
-      return cmp;
-    }
-    cmp = relationship.compareTo(o.relationship);
     if (cmp != 0) {
       return cmp;
     }
@@ -52,9 +45,5 @@ public class Edge implements Comparable<Edge> {
 
   public Node to() {
     return to;
-  }
-
-  public Relationship relationship() {
-    return relationship;
   }
 }

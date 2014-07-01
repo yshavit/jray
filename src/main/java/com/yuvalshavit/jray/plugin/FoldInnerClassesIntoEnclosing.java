@@ -1,30 +1,32 @@
 package com.yuvalshavit.jray.plugin;
 
 import com.yuvalshavit.jray.Graph;
+import com.yuvalshavit.jray.Scanner;
 import com.yuvalshavit.jray.node.Node;
-import com.yuvalshavit.jray.node.Relationship;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class FoldInnerClassesIntoEnclosing implements Consumer<Graph> {
+public final class FoldInnerClassesIntoEnclosing implements Consumer<Scanner> {
 
   @Override
-  public void accept(Graph graph) {
-    graph.getEdges().stream().filter(e -> e.relationship().isUsageFlow()).forEach(edge -> {
-      Node fromEnclosing = getEnclosingClass(edge.from(), graph);
-      Node toEnclosing = getEnclosingClass(edge.to(), graph);
-      graph.remove(edge);
+  public void accept(Scanner scanner) {
+    Graph enclosures = scanner.getEnclosures();
+    Graph flow = scanner.getFlow();
+    flow.getEdges().forEach(edge -> {
+      Node fromEnclosing = getEnclosingClass(edge.from(), enclosures);
+      Node toEnclosing = getEnclosingClass(edge.to(), enclosures);
+      flow.remove(edge);
       if (!toEnclosing.equals(fromEnclosing)) {
-        graph.add(fromEnclosing, edge.relationship(), toEnclosing);
+        flow.add(fromEnclosing, toEnclosing);
       }
     });
   }
 
   private static Node getEnclosingClass(Node from, Graph graph) {
     // TODO memoize
-    Set<Node> tos = graph.getSuccessors(from, Relationship.ENCLOSED_BY);
+    Set<Node> tos = graph.getSuccessors(from);
     if (tos.isEmpty()) {
       return from;
     }

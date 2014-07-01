@@ -1,7 +1,6 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Node;
-import com.yuvalshavit.jray.node.Relationship;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -17,28 +16,41 @@ public class Scanner extends ClassVisitor {
   private static final Set<String> primitives = new HashSet<>(Arrays.asList(
     "void", "byte", "char", "short", "int", "long", "float", "double", "boolean"));
 
-  private final Graph graph;
+  private final Graph flows = new Graph();
+  private final Graph enclosures = new Graph();
+  private final Set<Node> explicitlySeenNodes = new HashSet<>();
   private Node visiting;
 
 
-  public Scanner(Graph graph) {
+  public Scanner() {
     super(Opcodes.ASM5);
-    this.graph = graph;
+  }
+
+  public Graph getFlow() {
+    return flows;
+  }
+
+  public Graph getEnclosures() {
+    return enclosures;
+  }
+
+  public Set<Node> getExplicitlySeenNodes() {
+    return explicitlySeenNodes;
   }
 
   @Override
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     visiting = node(name);
-    graph.add(visiting);
+    explicitlySeenNodes.add(visiting);
   }
 
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     if ((Opcodes.ACC_PUBLIC & access) != 0) {
       Type t = Type.getMethodType(desc);
-      handleIfRef(t.getReturnType(), to -> link(visiting, Relationship.FLOW, to));
+      handleIfRef(t.getReturnType(), to -> link(flows, visiting, to));
       for (Type argType : t.getArgumentTypes()) {
-        handleIfRef(argType, argNode -> link(argNode, Relationship.FLOW, visiting));
+        handleIfRef(argType, argNode -> link(flows, argNode, visiting));
       }
     }
     return null;
@@ -49,13 +61,13 @@ public class Scanner extends ClassVisitor {
     if (outerName != null) {
       Node outer = node(outerName);
       Node inner = node(name);
-      link(inner, Relationship.ENCLOSED_BY, outer);
+      link(enclosures, inner, outer);
     }
   }
 
   @Override
   public void visitOuterClass(String owner, String name, String desc) {
-    link(visiting, Relationship.ENCLOSED_BY, node(owner));
+    link(enclosures, visiting, node(owner));
   }
 
   private void handleIfRef(Type type, Consumer<? super Node> action) {
@@ -71,7 +83,7 @@ public class Scanner extends ClassVisitor {
     return new Node(name);
   }
 
-  private void link(Node from, Relationship relationship, Node to) {
-    graph.add(from, relationship, to);
+  private void link(Graph graph, Node from, Node to) {
+    graph.add(from, to);
   }
 }
