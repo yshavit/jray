@@ -76,10 +76,12 @@ public class JarReader {
     directed.stream()
       .sorted()
       .forEach(e -> out.printf("  \"%s\" -> \"%s\";%n", e.from().getSimpleClassName(), e.to().getSimpleClassName()));
+    String undirOptions = "[dir=both, arrowhead=dot, arrowtail=dot, color=red]";
     undirected.stream()
       .sorted()
-      .forEach(e -> out.printf("  \"%s\" -> \"%s\" [dir=both, arrowhead=dot, arrowtail=dot];%n",
-                               e.from().getSimpleClassName(), e.to().getSimpleClassName()));
+      .forEach(e -> out.printf("  \"%s\" -> \"%s\" " + undirOptions + ";%n",
+                               e.from().getSimpleClassName(),
+                               e.to().getSimpleClassName()));
     out.println("}");
   }
 }
