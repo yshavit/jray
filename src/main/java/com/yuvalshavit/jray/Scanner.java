@@ -29,10 +29,6 @@ public class Scanner extends ClassVisitor {
   @Override
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     visiting = node(name);
-    link(visiting, Relationship.IS_A, node(superName));
-    for (String interfaceName : interfaces) {
-      link(visiting, Relationship.IMPLEMENTS, node(interfaceName));
-    }
     graph.add(visiting);
   }
 
