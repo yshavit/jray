@@ -74,34 +74,24 @@ public class JarReader {
   private static void printDotFile(String name, Set<Edge> edges, PrintStream out) throws IOException {
     out.printf("digraph \"%s\" {%n", name);
     edges.stream()
-      .filter(e -> e.relationship() == Relationship.CONSUMES || e.relationship() == Relationship.PRODUCES)
+      .filter(e -> e.relationship() == Relationship.FLOW)
       .sorted()
       .forEach(e -> {
         Node from;
         Node to;
-        String color;
         switch (e.relationship()) {
-        case PRODUCES:
-          color = "green";
+        case FLOW:
           from = e.from();
           to = e.to();
-          break;
-        case CONSUMES:
-          color = "blue";
-          // reverse the arrows
-          from = e.to();
-          to = e.from();
           break;
         default:
           from = e.from();
           to = e.to();
-          color = "black";
           break;
         }
-        out.printf("  \"%s\" -> \"%s\" [color=%s];%n",
+        out.printf("  \"%s\" -> \"%s\";%n",
                                from.getSimpleClassName(),
-                               to.getSimpleClassName(),
-                               color);
+                               to.getSimpleClassName());
       });
     out.println("}");
   }

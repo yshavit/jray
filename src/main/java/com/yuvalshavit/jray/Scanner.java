@@ -36,9 +36,9 @@ public class Scanner extends ClassVisitor {
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     if ((Opcodes.ACC_PUBLIC & access) != 0) {
       Type t = Type.getMethodType(desc);
-      handleIfRef(t.getReturnType(), to -> link(visiting, Relationship.PRODUCES, to));
+      handleIfRef(t.getReturnType(), to -> link(visiting, Relationship.FLOW, to));
       for (Type argType : t.getArgumentTypes()) {
-        handleIfRef(argType, argNode -> link(visiting, Relationship.CONSUMES, argNode));
+        handleIfRef(argType, argNode -> link(argNode, Relationship.FLOW, visiting));
       }
     }
     return null;

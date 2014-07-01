@@ -1,7 +1,7 @@
 package com.yuvalshavit.jray.node;
 
 public enum Relationship {
-  CONSUMES, PRODUCES, ENCLOSED_BY;
+  FLOW, ENCLOSED_BY;
 
   @Override
   public String toString() {
@@ -9,6 +9,6 @@ public enum Relationship {
   }
 
   public boolean isUsageFlow() {
-    return this == CONSUMES || this == PRODUCES;
+    return this == FLOW;
   }
 }
