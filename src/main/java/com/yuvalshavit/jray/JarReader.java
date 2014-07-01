@@ -73,15 +73,17 @@ public class JarReader {
 
   private static void printDotFile(String name, Set<Edge> directed, Set<Edge> undirected, PrintStream out) throws IOException {
     out.printf("digraph \"%s\" {%n", name);
+    out.println("  subgraph oneDirectional {");
     directed.stream()
       .sorted()
-      .forEach(e -> out.printf("  \"%s\" -> \"%s\";%n", e.from().getSimpleClassName(), e.to().getSimpleClassName()));
-    String undirOptions = "[dir=both, arrowhead=dot, arrowtail=dot, color=red]";
+      .forEach(e -> out.printf("    \"%s\" -> \"%s\";%n", e.from().getSimpleClassName(), e.to().getSimpleClassName()));
+    out.println("  }");
+    out.println("  subgraph twoDirectional {");
+    out.println("  edge [dir=both, arrowhead=dot, arrowtail=dot, color=red];");
     undirected.stream()
       .sorted()
-      .forEach(e -> out.printf("  \"%s\" -> \"%s\" " + undirOptions + ";%n",
-                               e.from().getSimpleClassName(),
-                               e.to().getSimpleClassName()));
+      .forEach(e -> out.printf("    \"%s\" -> \"%s\";%n", e.from().getSimpleClassName(), e.to().getSimpleClassName()));
+    out.println("  }");
     out.println("}");
   }
 }
