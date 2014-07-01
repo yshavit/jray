@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Graph {
-  private final Set<Node> nodes = new HashSet<>();
   private final Map<Node, Set<Node>> edges = new HashMap<>();
 
   public Set<Edge> getEdges() {
@@ -31,8 +30,9 @@ public class Graph {
     return Collections.unmodifiableSet(outgoing);
   }
 
-  public Set<Node> getNodes() {
-    return nodes;
+  public boolean hasEdge(Node from, Node to) {
+    Set<Node> outgoing = edges.get(from);
+    return outgoing != null && outgoing.contains(to);
   }
 
   public void add(Node from, Node to) {
@@ -42,10 +42,6 @@ public class Graph {
       edges.put(from, outgoing);
     }
     outgoing.add(to);
-  }
-
-  public void add(Node node) {
-    nodes.add(node);
   }
 
   public void remove(Edge edge) {

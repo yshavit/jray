@@ -21,7 +21,6 @@ public class Scanner extends ClassVisitor {
   private final Set<Node> explicitlySeenNodes = new HashSet<>();
   private Node visiting;
 
-
   public Scanner() {
     super(Opcodes.ASM5);
   }

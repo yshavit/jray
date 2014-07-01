@@ -1,8 +1,8 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Edge;
-import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
+import com.yuvalshavit.jray.plugin.FindUndirected;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
 import com.yuvalshavit.jray.plugin.RemoveSelfLinks;
 import org.objectweb.asm.ClassReader;
@@ -43,10 +43,12 @@ public class JarReader {
   }
 
   public static void main(String[] filePaths) {
+    FindUndirected findUndirected = new FindUndirected();
     List<Consumer<Scanner>> graphModifiers = Arrays.asList(
       new FilterEdgesToKnownNodes(),
       new RemoveSelfLinks(),
-      new FoldInnerClassesIntoEnclosing());
+      new FoldInnerClassesIntoEnclosing(),
+      findUndirected);
 
     for (String filePath : filePaths) {
       File file = new File(filePath);
@@ -61,7 +63,7 @@ public class JarReader {
 //          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
 //          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
 //          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
-          printDotFile(file.getName(), scanner.getFlow().getEdges(), System.out);
+          printDotFile(file.getName(), scanner.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -69,17 +71,15 @@ public class JarReader {
     }
   }
 
-  private static void printDotFile(String name, Set<Edge> edges, PrintStream out) throws IOException {
+  private static void printDotFile(String name, Set<Edge> directed, Set<Edge> undirected, PrintStream out) throws IOException {
     out.printf("digraph \"%s\" {%n", name);
-    edges.stream()
+    directed.stream()
       .sorted()
-      .forEach(e -> {
-        Node from = e.from();
-        Node to = e.to();
-        out.printf("  \"%s\" -> \"%s\";%n",
-                               from.getSimpleClassName(),
-                               to.getSimpleClassName());
-      });
+      .forEach(e -> out.printf("  \"%s\" -> \"%s\";%n", e.from().getSimpleClassName(), e.to().getSimpleClassName()));
+    undirected.stream()
+      .sorted()
+      .forEach(e -> out.printf("  \"%s\" -> \"%s\" [dir=both, arrowhead=dot, arrowtail=dot];%n",
+                               e.from().getSimpleClassName(), e.to().getSimpleClassName()));
     out.println("}");
   }
 }
