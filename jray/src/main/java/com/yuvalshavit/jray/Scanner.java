@@ -1,8 +1,6 @@
 package com.yuvalshavit.jray;
 
-import com.yuvalshavit.jray.annotation.Output;
 import com.yuvalshavit.jray.node.Node;
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -17,19 +15,17 @@ public class Scanner extends ClassVisitor {
 
   private static final Set<String> primitives = new HashSet<>(Arrays.asList(
     "void", "byte", "char", "short", "int", "long", "float", "double", "boolean"));
-  private static final String outputAnnotation = "L" + Output.class.getCanonicalName().replace('.', '/') + ";";
 
-  private final Graph flows = new Graph();
+  /** A -> B means A produces a B; there's a method A.f() that returns B. */
+  private final Graph producers = new Graph();
+  /** A -> B means A consumes B; there's a method A.f(...) that takes a B arg. */
+  private final Graph consumers = new Graph();
   private final Graph enclosures = new Graph();
   private final Set<Node> explicitlySeenNodes = new HashSet<>();
   private Node visiting;
 
   public Scanner() {
     super(Opcodes.ASM5);
-  }
-
-  public Graph getFlow() {
-    return flows;
   }
 
   public Graph getEnclosures() {
@@ -50,41 +46,13 @@ public class Scanner extends ClassVisitor {
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     if ((Opcodes.ACC_PUBLIC & access) != 0) {
       Type t = Type.getMethodType(desc);
-      handleIfRef(t.getReturnType(), to -> link(flows, visiting, to));
+      handleIfRef(t.getReturnType(), to -> link(producers, visiting, to));
       Type[] args = t.getArgumentTypes();
-      boolean[] isOutput = new boolean[args.length];
-      Node[] argNodes = new Node[args.length];
-      for (int i = 0; i < args.length; ++i) {
-        final int idx = i;
-        handleIfRef(args[i], argNode -> argNodes[idx] = argNode);
+      for (Type arg : args) {
+        handleIfRef(arg, argNode -> link(consumers, visiting, argNode));
       }
-
-      return new MethodVisitor(Opcodes.ASM5) {
-        @Override
-        public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
-          if (outputAnnotation.equals(desc)) {
-            isOutput[parameter] = true;
-          }
-          return null;
-        }
-
-        @Override
-        public void visitEnd() {
-          for (int i = 0; i < args.length; ++i) {
-            Node node = argNodes[i];
-            if (node != null) {
-              if (isOutput[i]) {
-                link(flows, visiting, node);
-              } else {
-                link(flows, node, visiting);
-              }
-            }
-          }
-        }
-      };
-    } else {
-      return null;
     }
+    return null;
   }
 
   @Override

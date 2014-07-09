@@ -1,19 +1,19 @@
 package com.yuvalshavit.jray.plugin;
 
+import com.yuvalshavit.jray.FlowAnalyzer;
 import com.yuvalshavit.jray.Graph;
-import com.yuvalshavit.jray.Scanner;
 import com.yuvalshavit.jray.node.Node;
 
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class FoldInnerClassesIntoEnclosing implements Consumer<Scanner> {
+public final class FoldInnerClassesIntoEnclosing implements Consumer<FlowAnalyzer> {
 
   @Override
-  public void accept(Scanner scanner) {
-    Graph enclosures = scanner.getEnclosures();
-    Graph flow = scanner.getFlow();
+  public void accept(FlowAnalyzer flows) {
+    Graph enclosures = flows.getScanner().getEnclosures();
+    Graph flow = flows.getFlow();
     flow.getEdges().forEach(edge -> {
       Node fromEnclosing = getEnclosingClass(edge.from(), enclosures);
       Node toEnclosing = getEnclosingClass(edge.to(), enclosures);
