@@ -1,1 +1,3 @@
 - how are generics handled?
+- Need to be a bit more clever about flows. For instance, MethodsFinder says it doesn't have any outflow, but it flows to three classes: TypeRegistry, MethodsRegistry and CompileErrors.
+  - For generics, note that MethodsRegistry is parameterized to EffesParser.InlinableBlockContext, so we'd want to make sure that _isn't_ part of the flow, probably. Though EffesParser already flows into MethodsFinder, so maybe that's fine.
