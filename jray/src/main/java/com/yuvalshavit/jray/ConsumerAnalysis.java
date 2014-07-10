@@ -52,7 +52,7 @@ public class ConsumerAnalysis extends ClassVisitor {
 
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-    if ((visiting != null) && (Opcodes.ACC_PUBLIC & access) != 0) {
+    if (visiting != null) {
       MethodNode methodNode = new MethodNode(access, name, desc, signature, exceptions);
       return new FlowMethodVisistor(methodNode);
     } else {
