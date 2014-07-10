@@ -44,7 +44,7 @@ public class JarReader {
 
   public static void main(String[] filePaths) {
     FindUndirected findUndirected = new FindUndirected();
-    List<Consumer<FlowAnalyzer>> graphModifiers = Arrays.asList(
+    List<Consumer<ConsumerAnalysis>> graphModifiers = Arrays.asList(
       new FilterEdgesToKnownNodes(),
       new RemoveSelfLinks(),
       new FoldInnerClassesIntoEnclosing(),
@@ -57,14 +57,14 @@ public class JarReader {
       } else {
         try {
           Scanner scanner = new JarReader(file).read();
-          FlowAnalyzer flowAnalyzer = new FlowAnalyzer(scanner);
-          for (Consumer<FlowAnalyzer> modifier : graphModifiers) {
-            modifier.accept(flowAnalyzer);
+          ConsumerAnalysis consumerAnalysis = new ConsumerAnalysis(scanner);
+          for (Consumer<ConsumerAnalysis> modifier : graphModifiers) {
+            modifier.accept(consumerAnalysis);
           }
 //          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
 //          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
 //          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
-          printDotFile(file.getName(), flowAnalyzer.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
+          printDotFile(file.getName(), consumerAnalysis.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }

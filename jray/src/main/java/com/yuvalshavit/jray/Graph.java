@@ -44,6 +44,10 @@ public class Graph {
     outgoing.add(to);
   }
 
+  public void add(Edge edge) {
+    add(edge.from(), edge.to());
+  }
+
   public void remove(Edge edge) {
     Set<Node> outgoing = edges.get(edge.from());
     if (outgoing != null) {

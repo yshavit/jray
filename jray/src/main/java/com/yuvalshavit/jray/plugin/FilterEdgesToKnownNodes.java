@@ -1,6 +1,6 @@
 package com.yuvalshavit.jray.plugin;
 
-import com.yuvalshavit.jray.FlowAnalyzer;
+import com.yuvalshavit.jray.ConsumerAnalysis;
 import com.yuvalshavit.jray.Graph;
 import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Edge;
@@ -8,9 +8,9 @@ import com.yuvalshavit.util.CommonPackageFinder;
 
 import java.util.function.Consumer;
 
-public class FilterEdgesToKnownNodes implements Consumer<FlowAnalyzer> {
+public class FilterEdgesToKnownNodes implements Consumer<ConsumerAnalysis> {
   @Override
-  public void accept(FlowAnalyzer flows) {
+  public void accept(ConsumerAnalysis flows) {
     Graph graph = flows.getFlow();
     String commonPackage = CommonPackageFinder.get(flows.getScanner().getExplicitlySeenNodes(), Node::toString);
     if (!commonPackage.endsWith(".")) {

@@ -1,6 +1,6 @@
 package com.yuvalshavit.jray.plugin;
 
-import com.yuvalshavit.jray.FlowAnalyzer;
+import com.yuvalshavit.jray.ConsumerAnalysis;
 import com.yuvalshavit.jray.Graph;
 import com.yuvalshavit.jray.node.Edge;
 
@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class FindUndirected implements Consumer<FlowAnalyzer> {
+public final class FindUndirected implements Consumer<ConsumerAnalysis> {
 
   private final Set<Edge> undirected = new HashSet<>();
 
   @Override
-  public void accept(FlowAnalyzer flows) {
+  public void accept(ConsumerAnalysis flows) {
     Graph flow = flows.getFlow();
     flow.getEdges().stream()
       .filter(edge -> flow.hasEdge(edge.to(), edge.from()))

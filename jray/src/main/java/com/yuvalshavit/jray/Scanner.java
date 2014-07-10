@@ -28,6 +28,14 @@ public class Scanner extends ClassVisitor {
     super(Opcodes.ASM5);
   }
 
+  public Graph getProducers() {
+    return producers;
+  }
+
+  public Graph getConsumers() {
+    return consumers;
+  }
+
   public Graph getEnclosures() {
     return enclosures;
   }
