@@ -1,6 +1,5 @@
 package com.yuvalshavit.jray.plugin;
 
-import com.yuvalshavit.jray.ConsumerAnalysis;
 import com.yuvalshavit.jray.Graph;
 import com.yuvalshavit.jray.node.Node;
 
@@ -8,12 +7,16 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class FoldInnerClassesIntoEnclosing implements Consumer<ConsumerAnalysis> {
+public final class FoldInnerClassesIntoEnclosing implements Consumer<Graph> {
+
+  private final Graph enclosures;
+
+  public FoldInnerClassesIntoEnclosing(Graph enclosures) {
+    this.enclosures = enclosures;
+  }
 
   @Override
-  public void accept(ConsumerAnalysis flows) {
-    Graph enclosures = flows.getScanner().getEnclosures();
-    Graph flow = flows.getFlow();
+  public void accept(Graph flow) {
     flow.getEdges().forEach(edge -> {
       Node fromEnclosing = getEnclosingClass(edge.from(), enclosures);
       Node toEnclosing = getEnclosingClass(edge.to(), enclosures);

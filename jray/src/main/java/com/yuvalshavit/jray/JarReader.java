@@ -41,12 +41,6 @@ public class JarReader {
   }
 
   public static void main(String[] filePaths) {
-    FindUndirected findUndirected = new FindUndirected();
-    List<Consumer<ConsumerAnalysis>> graphModifiers = Arrays.asList(
-      new FilterEdgesToKnownNodes(),
-      new RemoveSelfLinks(),
-      new FoldInnerClassesIntoEnclosing(),
-      findUndirected);
 
     for (String filePath : filePaths) {
       File file = new File(filePath);
@@ -55,14 +49,18 @@ public class JarReader {
       } else {
         try {
           JarReader jarReader = new JarReader(file);
-          Scanner scanner = new Scanner();
-          ConsumerAnalysis analysis = new ConsumerAnalysis(scanner);
-          jarReader.read(cr -> cr.accept(scanner, 0));
-          jarReader.read(cr -> cr.accept(analysis, 0));
 
-          for (Consumer<ConsumerAnalysis> modifier : graphModifiers) {
-            modifier.accept(analysis);
-          }
+          Scanner scanner = new Scanner();
+          jarReader.read(cr -> cr.accept(scanner, 0));
+          scanner.accept(new FilterEdgesToKnownNodes(scanner.getExplicitlySeenNodes()));
+          scanner.accept(new FoldInnerClassesIntoEnclosing(scanner.getEnclosures()));
+
+          ConsumerAnalysis analysis = new ConsumerAnalysis(scanner);
+          jarReader.read(cr -> cr.accept(analysis, 0));
+          new RemoveSelfLinks().accept(analysis.getFlow());
+          FindUndirected findUndirected = new FindUndirected();
+          findUndirected.accept(analysis.getFlow());
+
 //          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
 //          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
 //          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());

@@ -44,6 +44,11 @@ public class Scanner extends ClassVisitor {
     return explicitlySeenNodes;
   }
 
+  public void accept(Consumer<? super Graph> graphConsumer) {
+    graphConsumer.accept(consumers);
+    graphConsumer.accept(producers);
+  }
+
   @Override
   public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     visiting = node(name);

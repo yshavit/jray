@@ -1,18 +1,24 @@
 package com.yuvalshavit.jray.plugin;
 
-import com.yuvalshavit.jray.ConsumerAnalysis;
 import com.yuvalshavit.jray.Graph;
 import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.node.Edge;
 import com.yuvalshavit.util.CommonPackageFinder;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
-public class FilterEdgesToKnownNodes implements Consumer<ConsumerAnalysis> {
+public class FilterEdgesToKnownNodes implements Consumer<Graph> {
+
+  private final Set<Node> knownNodes;
+
+  public FilterEdgesToKnownNodes(Set<Node> knownNodes) {
+    this.knownNodes = knownNodes;
+  }
+
   @Override
-  public void accept(ConsumerAnalysis flows) {
-    Graph graph = flows.getFlow();
-    String commonPackage = CommonPackageFinder.get(flows.getScanner().getExplicitlySeenNodes(), Node::toString);
+  public void accept(Graph graph) {
+    String commonPackage = CommonPackageFinder.get(knownNodes, Node::toString);
     if (!commonPackage.endsWith(".")) {
       int lastDot = commonPackage.lastIndexOf('.');
       if (lastDot < 0) {
