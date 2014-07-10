@@ -53,7 +53,8 @@ public class ConsumerAnalysis extends ClassVisitor {
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     if ((visiting != null) && (Opcodes.ACC_PUBLIC & access) != 0) {
-      return new FlowMethodVisistor();
+      MethodNode methodNode = new MethodNode(access, name, desc, signature, exceptions);
+      return new FlowMethodVisistor(methodNode);
     } else {
       return null;
     }
@@ -70,11 +71,7 @@ public class ConsumerAnalysis extends ClassVisitor {
   private class FlowMethodVisistor extends MethodVisitor {
     private final MethodNode node;
 
-    FlowMethodVisistor() {
-      this(new MethodNode());
-    }
-
-    private FlowMethodVisistor(MethodNode node) {
+    FlowMethodVisistor(MethodNode node) {
       super(Opcodes.ASM5, node);
       this.node = node;
     }

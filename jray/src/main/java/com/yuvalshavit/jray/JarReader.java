@@ -26,8 +26,7 @@ public class JarReader {
     this.zipFile = zipFile;
   }
 
-  public Scanner read() throws IOException {
-    Scanner scanner = new Scanner();
+  public void read(Consumer<ClassReader> classReaderConsumer) throws IOException {
     try (FileInputStream fileStreamRaw = new FileInputStream(zipFile);
          BufferedInputStream fileStream = new BufferedInputStream(fileStreamRaw);
          ZipInputStream zipStream = new ZipInputStream(fileStream))
@@ -35,11 +34,10 @@ public class JarReader {
       for (ZipEntry entry = zipStream.getNextEntry(); entry != null; entry = zipStream.getNextEntry()) {
         if (entry.getName().endsWith(".class")) {
           ClassReader classReader = new ClassReader(zipStream);
-          classReader.accept(scanner, 0);
+          classReaderConsumer.accept(classReader);
         }
       }
     }
-    return scanner;
   }
 
   public static void main(String[] filePaths) {
@@ -56,15 +54,19 @@ public class JarReader {
         System.err.println("No such file: " + filePath);
       } else {
         try {
-          Scanner scanner = new JarReader(file).read();
-          ConsumerAnalysis consumerAnalysis = new ConsumerAnalysis(scanner);
+          JarReader jarReader = new JarReader(file);
+          Scanner scanner = new Scanner();
+          ConsumerAnalysis analysis = new ConsumerAnalysis(scanner);
+          jarReader.read(cr -> cr.accept(scanner, 0));
+          jarReader.read(cr -> cr.accept(analysis, 0));
+
           for (Consumer<ConsumerAnalysis> modifier : graphModifiers) {
-            modifier.accept(consumerAnalysis);
+            modifier.accept(analysis);
           }
 //          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
 //          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
 //          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
-          printDotFile(file.getName(), consumerAnalysis.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
+          printDotFile(file.getName(), analysis.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }
