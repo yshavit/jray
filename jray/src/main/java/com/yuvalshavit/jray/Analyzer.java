@@ -37,9 +37,4 @@ public class Analyzer {
     }
   }
 
-  public static class AnalysisException extends RuntimeException {
-    public AnalysisException(Throwable cause) {
-      super(cause);
-    }
-  }
 }
