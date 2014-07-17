@@ -1,10 +1,6 @@
 package com.yuvalshavit.jray;
 
 import com.yuvalshavit.jray.node.Edge;
-import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
-import com.yuvalshavit.jray.plugin.FindUndirected;
-import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
-import com.yuvalshavit.jray.plugin.RemoveSelfLinks;
 import org.objectweb.asm.ClassReader;
 
 import java.io.BufferedInputStream;
@@ -12,21 +8,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class JarReader {
+public class JarReader implements ClassFinder {
   private final File zipFile;
 
   public JarReader(File zipFile) {
     this.zipFile = zipFile;
   }
 
-  public void read(Consumer<ClassReader> classReaderConsumer) throws IOException {
+  @Override
+  public void forEach(Consumer<ClassReader> classReaderConsumer) throws IOException {
     try (FileInputStream fileStreamRaw = new FileInputStream(zipFile);
          BufferedInputStream fileStream = new BufferedInputStream(fileStreamRaw);
          ZipInputStream zipStream = new ZipInputStream(fileStream))
@@ -49,22 +44,8 @@ public class JarReader {
       } else {
         try {
           JarReader jarReader = new JarReader(file);
-
-          Scanner scanner = new Scanner();
-          jarReader.read(cr -> cr.accept(scanner, 0));
-          scanner.accept(new FilterEdgesToKnownNodes(scanner.getExplicitlySeenNodes()));
-          scanner.accept(new FoldInnerClassesIntoEnclosing(scanner.getEnclosures()));
-
-          ConsumerAnalysis analysis = new ConsumerAnalysis(scanner);
-          jarReader.read(cr -> cr.accept(analysis, 0));
-          new RemoveSelfLinks().accept(analysis.getFlow());
-          FindUndirected findUndirected = new FindUndirected();
-          findUndirected.accept(analysis.getFlow());
-
-//          new TreeSet<>(graph.getEdges()).forEach(System.out::println);
-//          new TreeSet<>(graph.getNodes()).forEach(System.out::println);
-//          System.out.printf("%d nodes, %d edges%n", graph.getNodes().size(), graph.getEdges().size());
-          printDotFile(file.getName(), analysis.getFlow().getEdges(), findUndirected.getUndirected(), System.out);
+          FullAnalysis analysis = Analyzer.analyze(jarReader);
+          printDotFile(file.getName(), analysis.getFlows(), analysis.getCouplings(), System.out);
         } catch (IOException e) {
           e.printStackTrace();
         }
