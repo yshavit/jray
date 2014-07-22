@@ -3,6 +3,7 @@ package com.yuvalshavit.jray;
 import com.yuvalshavit.jray.node.Edge;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 public class FullAnalysis {
   private final Set<Edge> flows;
@@ -19,5 +20,13 @@ public class FullAnalysis {
 
   public Set<Edge> getCouplings() {
     return couplings;
+  }
+
+  public Set<Edge> getAllEdges() {
+    Set<Edge> all = new TreeSet<>();
+    all.addAll(flows);
+    all.addAll(couplings);
+    couplings.forEach(edge -> all.add(new Edge(edge.to(), edge.from())));
+    return all;
   }
 }

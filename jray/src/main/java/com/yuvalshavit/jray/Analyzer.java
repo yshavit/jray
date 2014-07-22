@@ -1,5 +1,6 @@
 package com.yuvalshavit.jray;
 
+import com.yuvalshavit.jray.node.Node;
 import com.yuvalshavit.jray.plugin.FilterEdgesToKnownNodes;
 import com.yuvalshavit.jray.plugin.FindUndirected;
 import com.yuvalshavit.jray.plugin.FoldInnerClassesIntoEnclosing;
@@ -13,11 +14,15 @@ public class Analyzer {
   private Analyzer() {}
 
   public static FullAnalysis analyze(ClassFinder classes) {
+    return analyze(classes, null);
+  }
+
+  public static FullAnalysis analyze(ClassFinder classes, Node topLevel) {
     Scanner scanner = new Scanner();
 
     runStep(classes, scanner);
     scanner.accept(new FilterEdgesToKnownNodes(scanner.getExplicitlySeenNodes()));
-    scanner.accept(new FoldInnerClassesIntoEnclosing(scanner.getEnclosures()));
+    scanner.accept(new FoldInnerClassesIntoEnclosing(scanner.getEnclosures(), topLevel));
 
     ConsumerAnalysis analysis = new ConsumerAnalysis(scanner);
     runStep(classes, analysis);
