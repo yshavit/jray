@@ -1,9 +1,10 @@
 package com.yuvalshavit.jray.test;
 
-public class HolderIsntConsumerTest extends AnalysisTestBase {
+public class StoreThenUseTest extends AnalysisTestBase {
   @Override
   protected void expectEdges(EdgeBuilder builder) {
-    builder.none();
+    builder
+      .add(Consumer.class, Payload.class);
   }
 
   @SuppressWarnings("unused")
@@ -14,8 +15,13 @@ public class HolderIsntConsumerTest extends AnalysisTestBase {
   @SuppressWarnings("unused")
   public static class Consumer {
     private final Payload input;
+
     public Consumer(Payload input) {
       this.input = input;
+    }
+
+    public void use() {
+      input.deliver();
     }
   }
 }

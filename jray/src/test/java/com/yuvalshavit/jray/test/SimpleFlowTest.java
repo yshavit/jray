@@ -13,6 +13,7 @@ public class SimpleFlowTest extends AnalysisTestBase {
   }
 
   public static class Producer {
+    @SuppressWarnings("unused")
     public Payload create() {
       throw new UnsupportedOperationException();
     }
