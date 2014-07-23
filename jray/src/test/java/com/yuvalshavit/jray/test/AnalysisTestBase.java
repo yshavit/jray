@@ -1,6 +1,7 @@
 package com.yuvalshavit.jray.test;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;
 import com.yuvalshavit.jray.Analyzer;
 import com.yuvalshavit.jray.ClassFinder;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 
 abstract class AnalysisTestBase {
@@ -45,12 +47,16 @@ abstract class AnalysisTestBase {
 
     EdgeBuilder edgeBuilder = new EdgeBuilder();
     expectEdges(edgeBuilder);
+    if (edgeBuilder.edges.isEmpty()) {
+      assertTrue(edgeBuilder.explicitlyNone, "no edges provided, but neither was none() called");
+    }
     Set<Edge> expected = edgeBuilder.edges;
     assertEquals(expected, analysis.getAllEdges());
   }
 
   protected static class EdgeBuilder {
     private Set<Edge> edges = new TreeSet<>();
+    private boolean explicitlyNone;
 
     public EdgeBuilder add(Class<?> from, Class<?> to) {
       Node fromNode = new Node(from.getName());
@@ -59,8 +65,13 @@ abstract class AnalysisTestBase {
     }
 
     public EdgeBuilder add(Edge edge) {
+      Preconditions.checkState(!explicitlyNone, "can't call add(..) after none()");
       edges.add(edge);
       return this;
+    }
+
+    public void none() {
+      explicitlyNone = true;
     }
   }
 }
